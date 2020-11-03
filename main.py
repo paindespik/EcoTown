@@ -37,8 +37,12 @@ def drawGrid(w, h, lines, rows, surface):
         for j in range(len(carte[0])):
             if carte[j][i] == 0:
                 surface.blit(pygame.image.load('images/route.jpg'), (50*j, 50*i, 50, 50))
-            if carte[j][i] == 1:
+            elif carte[j][i] == 1:
                 surface.blit(pygame.image.load('images/maison.png'), (50 * j, 50 * i, 50, 50))
+            elif carte[j][i] == 2:
+                surface.blit(pygame.image.load('images/maison.png'), (50 * j, 50 * i, 50, 50))
+            elif carte[j][i] == 3:
+                surface.blit(pygame.image.load('images/park.png'), (50 * j, 50 * i, 50, 50))
     x = 0
     y = 0
     for l in range(rows):
@@ -64,46 +68,59 @@ def placerPersonnage(surface, personnage):
     pass
 
 
+def texte(surface):
+    font = pygame.font.SysFont("comicsansms", 30)
+    txtTitre = "EcoTown"
+    titre = font.render(txtTitre, True, (255, 255, 255))
+    surface.blit(titre, (width+(widthTexte/3), 50))
+    pass
+
+
 def redrawWindow(surface):
     global rows, width, s, snack, personnage
     surface.fill((0, 0, 0))
     blit_alpha(surface, background, (0, 0), 128)
     drawGrid(width, height, lines, rows, surface)
     placerPersonnage(surface, personnage)
+    texte(surface)
     pygame.display.update()
 
 
 def main():
     pygame.init()
-    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, pas
-    pas = 3
+    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, pas, widthTexte
+    pas = 6
 
     carte = [
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        [0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+        [0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 2],
+        [0, 1, 0, 1, 1, 1, 1, 3, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 2],
+        [0, 1, 0, 1, 3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+        [0, 1, 0, 3, 3, 3, 3, 3, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 2],
+        [0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2],
+        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 2],
+        [0, 1, 1, 1, 1, 1, 0, 2, 2, 0, 2, 2, 0, 1, 1, 0, 1, 1, 0, 2],
+        [0, 1, 1, 1, 1, 1, 0, 2, 2, 0, 2, 2, 0, 1, 1, 0, 1, 1, 0, 2],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [3, 1, 0, 1, 1, 1, 0, 2, 2, 0, 2, 2, 0, 1, 1, 0, 2, 2, 0, 1],
+        [3, 1, 0, 1, 3, 1, 0, 2, 2, 0, 2, 2, 0, 1, 1, 0, 2, 0, 0, 0],
+        [3, 1, 0, 1, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 0, 3, 0],
+        [3, 1, 0, 1, 3, 1, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 3, 0],
+        [3, 1, 0, 1, 3, 1, 0, 2, 2, 0, 2, 2, 0, 1, 1, 0, 3, 3, 3, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+        [1, 1, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0],
+        [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
     ]
+
+
 
     personnage = Personnage()
     width = 1000
     height = 1000
+    widthTot = 1300
+    widthTexte = widthTot - width
     background = pygame.image.load('images/background.png')
     soldats = []
     rows = 20
@@ -113,7 +130,7 @@ def main():
     for i in range(8):
         possibilities.append(False)
     sizeBtwnY = height // lines
-    win = pygame.display.set_mode((width, height))
+    win = pygame.display.set_mode((widthTot, height))
     background = pygame.image.load('images/background.png')
     running = True
     pressed = {}
