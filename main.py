@@ -4,36 +4,41 @@ import pygame
 
 class Personnage:
     def __init__(self):
+        self.width = 25
+        self.height = 39
         self.x = 0
         self.y = 0
+        self.hautGauche = (self.x, self.y)
+        self.hautDroit = (self.x + self.width, self.y)
+        self.basGauche = (self.x, self.y+self.height)
+        self.basDroit = (self.x + self.width, self.y+self.height)
         self.image = pygame.image.load('images/personnage.png')
 
     def move_right(self):
-        if self.x != rows-1:
-            self.x = self.x + 1
+        if self.x+pas < width:
+            self.x = self.x + pas
 
     def move_left(self):
-        if self.x != 0:
-            self.x = self.x - 1
+        if self.x-pas > 0:
+            self.x = self.x - pas
 
     def move_up(self):
-        if self.y != 0:
-            self.y = self.y - 1
+        if self.y-pas > 0:
+            self.y = self.y - pas
 
     def move_down(self):
-        if self.y != lines-1:
-            self.y = self.y + 1
+        if self.y+pas < height:
+            self.y = self.y + pas
 
 
 def drawGrid(w, h, lines, rows, surface):
-    global carte
 
     for i in range(len(carte)):
         for j in range(len(carte[0])):
             if carte[j][i] == 0:
                 surface.blit(pygame.image.load('images/route.jpg'), (50*j, 50*i, 50, 50))
             if carte[j][i] == 1:
-                surface.blit(pygame.image.load('images/ville1.png'), (50 * j, 50 * i, 50, 50))
+                surface.blit(pygame.image.load('images/maison.png'), (50 * j, 50 * i, 50, 50))
     x = 0
     y = 0
     for l in range(rows):
@@ -55,7 +60,7 @@ def blit_alpha(target, source, location, opacity):
 
 
 def placerPersonnage(surface, personnage):
-    surface.blit(personnage.image, (personnage.x, personnage.y, 50, 30))
+    surface.blit(personnage.image, (personnage.x, personnage.y, personnage.width, personnage.height))
     pass
 
 
@@ -70,12 +75,13 @@ def redrawWindow(surface):
 
 def main():
     pygame.init()
-    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte
+    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, pas
+    pas = 3
 
     carte = [
         [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -96,8 +102,6 @@ def main():
     ]
 
     personnage = Personnage()
-    personnage.x = 50
-    personnage.y = 50
     width = 1000
     height = 1000
     background = pygame.image.load('images/background.png')
@@ -131,15 +135,29 @@ def main():
                 pressed[event.key] = False
 
         if pressed.get(pygame.K_UP):
-            personnage.move_up()
+            x = int(personnage.x/50)
+            y = int((personnage.y+personnage.height-8-pas)/50)
+            x2 = int((personnage.x+personnage.width)/50)
+            if carte[x][y] == 0 and carte[x2][y] == 0:
+                personnage.move_up()
         if pressed.get(pygame.K_DOWN):
-            personnage.move_down()
+            x = int(personnage.x/50)
+            y = int((personnage.y+personnage.height+pas)/50)
+            x2 = int((personnage.x+personnage.width)/50)
+            if carte[x][y] == 0 and carte[x2][y] == 0:
+                personnage.move_down()
         if pressed.get(pygame.K_RIGHT):
-            personnage.move_right()
+            x = int((personnage.x+pas+personnage.width)/50)
+            y = int((personnage.y+personnage.height)/50)
+            if carte[x][y] == 0:
+                personnage.move_right()
         if pressed.get(pygame.K_LEFT):
-            personnage.move_left()
+            x = int((personnage.x-pas)/50)
+            y = int((personnage.y+personnage.height)/50)
+            if carte[x][y] == 0:
+                personnage.move_left()
 
-        clock.tick(10)
+        clock.tick(40)
         redrawWindow(win)
     pass
 
