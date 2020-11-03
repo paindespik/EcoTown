@@ -1,10 +1,12 @@
 import random
 import pygame
 
-class personnage():
-    def __init__(self, equipe):
+
+class Personnage:
+    def __init__(self):
         self.x = 0
         self.y = 0
+        self.image = pygame.image.load('images/personnage.png')
 
     def move_right(self):
         if self.x != rows-1:
@@ -44,11 +46,17 @@ def blit_alpha(target, source, location, opacity):
     target.blit(temp, location)
 
 
+def placerPersonnage(surface, personnage):
+    surface.blit(personnage.image, (personnage.x, personnage.y, 50, 30))
+    pass
+
+
 def redrawWindow(surface):
-    global rows, width, s, snack
+    global rows, width, s, snack, personnage
     surface.fill((0, 0, 0))
     blit_alpha(surface, background, (0, 0), 128)
     drawGrid(width, height, lines, rows, surface)
+    placerPersonnage(surface, personnage)
 
     pygame.display.update()
 
@@ -60,7 +68,10 @@ def redrawWindow(surface):
 
 def main():
     pygame.init()
-    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, joueur1, joueur2
+    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage
+    personnage = Personnage()
+    personnage.x = 50
+    personnage.y = 50
     width = 1000
     height = 1000
     background = pygame.image.load('images/background.png')
@@ -85,15 +96,16 @@ def main():
             3: "execo",
         }
         for event in pygame.event.get():
-             if event.type == pygame.QUIT:
-                 running = False
-                 pygame.quit()
-             elif event.type == pygame.KEYDOWN:
-                pressed[event.key] = True
-             elif event.type == pygame.KEYUP:
-                 pressed[event.key] = False
-             clock.tick(10)
-             redrawWindow(win)
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+            elif event.type == pygame.KEYDOWN:
+               pressed[event.key] = True
+            elif event.type == pygame.KEYUP:
+                pressed[event.key] = False
+            clock.tick(10)
+            redrawWindow(win)
+
 
     pass
 
