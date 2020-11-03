@@ -103,10 +103,18 @@ def main():
                pressed[event.key] = True
             elif event.type == pygame.KEYUP:
                 pressed[event.key] = False
-            clock.tick(10)
-            redrawWindow(win)
 
+        if pressed.get(pygame.K_UP):
+            personnage.move_up()
+        if pressed.get(pygame.K_DOWN):
+            personnage.move_down()
+        if pressed.get(pygame.K_RIGHT):
+            personnage.move_right()
+        if pressed.get(pygame.K_LEFT):
+            personnage.move_left()
 
+        clock.tick(10)
+        redrawWindow(win)
     pass
 
 
