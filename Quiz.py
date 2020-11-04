@@ -40,7 +40,7 @@ def QuestionVerifier(question,answer):
      }
 
 def Score(Score):
-     ScoreQuiz += 1
+     ScoreQuiz += Score
      return ScoreQuiz
 
 
