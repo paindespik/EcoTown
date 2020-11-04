@@ -1,5 +1,5 @@
 From Question import Question
-Score = 0
+ScoreQuiz = 0
 
 question_prompts = [
      "Quelle type d'énergie utiliser ?\n(a)Solaire\n(b)Charbon",
@@ -40,6 +40,8 @@ def QuestionVerifier(question,answer):
      }
 
 def Score(Score):
-     Score += 1
+     ScoreQuiz += 1
+     return ScoreQuiz
+
 
 run_quiz(questions)
