@@ -94,12 +94,22 @@ def texte(surface):
     titre = font.render(txtTitre, True, (255, 255, 255))
     surface.blit(titre, (width+(widthTexte/3), 50))
     if (int(personnage.x/50), int(personnage.y/50)) in listDechet:
-        txtTexte = "press SPACE to carry"
-        texte = font.render(txtTexte, True, (0, 255, 0))
+        fontTexte = pygame.font.SysFont("comicsansms", 15)
+        txtTexte = "ESPACE pour ramasser"
+        texte = fontTexte.render(txtTexte, True, (0, 255, 0))
+        surface.blit(texte, (width, 100))
+    elif personnage.inventaire:
+        fontTexte = pygame.font.SysFont("comicsansms", 15)
+        txtTexte = "Ramasser "+ objectifCannette +" objets pour améliorer la ville"
+        texte = fontTexte.render(txtTexte, True, (0, 255, 0))
         surface.blit(texte, (width, 100))
     if personnage.inventaire:
         x = 0
         y = 300
+        fontInventaire = pygame.font.SysFont("comicsansms", 30)
+        txtInventaire = fontInventaire.render("Inventaire", True, (255, 255, 255))
+        surface.blit(txtInventaire, (width + (widthTexte / 5), 250))
+
         for l in range(int(len(personnage.inventaire)/3)+1):
             pygame.draw.line(surface, (255, 255, 255), (width, y), (width+widthTexte, y))
             pygame.draw.line(surface, (255, 255, 255), (width, y+50), (width+widthTexte, y+50))
@@ -107,15 +117,18 @@ def texte(surface):
             pygame.draw.line(surface, (255, 255, 255), (width+2*widthTexte/3, y), (width+2*widthTexte/3, y+50))
             y = y + 50
 
+        x = width
+        y = 250
         for i in range(len(personnage.inventaire)):
-            surface.blit(pygame.image.load('images/canette1.png'), (width, y-50, 50, 50))
 
-    # for l in range(rows):
-    #     x = x + sizeBtwnX
-    #     pygame.draw.line(surface, (0, 0, 0), (x, 0), (x, h))
-    # for L in range(lines):
-    #     y = y + sizeBtwnY
-    #     pygame.draw.line(surface, (0, 0, 0), (0, y), (w, y))
+            if i%3 == 0:
+                y += 50
+                x = width
+            if personnage.inventaire[i][2] == 'cannette':
+                surface.blit(pygame.image.load('images/canette1.png'), (x, y, 50, 50))
+            x += widthTexte/3
+
+
     pass
 
 
@@ -131,7 +144,7 @@ def redrawWindow(surface):
 
 def main():
     pygame.init()
-    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, pas, widthTexte, listDechet
+    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, pas, widthTexte, listDechet, objectifCannette
     pas = 6
 
     carte = [
@@ -164,7 +177,7 @@ def main():
                 if etatevenement == 1:
                     listDechet.append((j,i))
 
-
+    objectifCannette = 4
     personnage = Personnage()
     # personnage.x=900
     # personnage.y=100
@@ -226,7 +239,7 @@ def main():
                 personnage.move_left()
         if pressed.get(pygame.K_SPACE):
             if personnage.case in listDechet:
-                personnage.inventaire.append((personnage.case[0], personnage.case[1], 1))
+                personnage.inventaire.append((personnage.case[0], personnage.case[1], 'cannette'))
                 listDechet.remove(personnage.case)
 
         clock.tick(40)
