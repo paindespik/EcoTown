@@ -305,7 +305,7 @@ def main():
 
 
 
-    objectifCannette = 2
+    objectifCannette = 3
     personnage = Personnage()
     luminosite = 175
     # personnage.x=900
