@@ -27,22 +27,22 @@ class Personnage:
     def move_right(self):
         if self.x+self.width + 5 +pas < width:
             self.x = self.x + pas
-            self.case = (int(self.x/50), int(self.y/50))
+            self.case = (int(self.x/50), int((self.y+self.height)/50))
 
     def move_left(self):
         if self.x-pas > 0:
             self.x = self.x - pas
-            self.case = (int(self.x/50), int(self.y/50))
+            self.case = (int(self.x/50), int((self.y+self.height)/50))
 
     def move_up(self):
         if self.y + 5 - pas > 0:
             self.y = self.y - pas
-            self.case = (int(self.x/50), int(self.y/50))
+            self.case = (int(self.x/50), int((self.y+self.height)/50))
 
     def move_down(self):
         if self.y+pas < height:
             self.y = self.y + pas
-            self.case = (int(self.x/50), int(self.y/50))
+            self.case = (int(self.x/50), int((self.y+self.height)/50))
 
 
 def drawGrid(w, h, lines, rows, surface):
@@ -81,7 +81,7 @@ def drawGrid(w, h, lines, rows, surface):
                 if (j,i) in listDechet:
                     surface.blit(pygame.image.load('images/canette1.png'), (50 * j, 50 * i, 50, 50))
                 elif (j, i) in emplacementPanneau:
-                    surface.blit(pygame.image.load('images/panneau.png'), (50 * j, 50 * i, 50, 50))
+                    surface.blit(pygame.image.load('images/paneau-v2.png'), (50 * j, 50 * i, 50, 50))
     x = 0
     y = 0
     for l in range(rows):
@@ -108,15 +108,41 @@ def placerPersonnage(surface, personnage):
 
 
 def texte(surface):
+    caseGauche = (personnage.case[0]+1, personnage.case[1], 0)
+    caseHaut = (personnage.case[0]-1, personnage.case[1], 0)
+    caseDoite = (personnage.case[0], personnage.case[1]+1, 0)
+    caseBas = (personnage.case[0], personnage.case[1]-1, 0)
+    aPanneau = False
+    for i in range(len(personnage.inventaire)):
+        if personnage.inventaire[i][2] == 'panneau':
+            aPanneau = True
+            break
     font = pygame.font.SysFont("comicsansms", 30)
     txtTitre = "EcoTown"
     titre = font.render(txtTitre, True, (255, 255, 255))
     surface.blit(titre, (width+(widthTexte/3), 50))
-    if (int(personnage.x/50), int(personnage.y/50)) in listDechet:
+    if personnage.case in listDechet:
         fontTexte = pygame.font.SysFont("comicsansms", 15)
         txtTexte = "ESPACE pour ramasser"
         texte = fontTexte.render(txtTexte, True, (0, 255, 0))
         surface.blit(texte, (width, 100))
+    elif personnage.case in emplacementPanneau:
+        fontTexte = pygame.font.SysFont("comicsansms", 15)
+        txtTexte = "ESPACE pour ramasser"
+        texte = fontTexte.render(txtTexte, True, (0, 255, 0))
+        surface.blit(texte, (width, 100))
+    elif caseGauche in emplacementMaisonAbime or caseBas in emplacementMaisonAbime or caseDoite in emplacementMaisonAbime or caseHaut in emplacementMaisonAbime:
+        if aPanneau == True:
+            fontTexte = pygame.font.SysFont("comicsansms", 15)
+            txtTexte = "Espace pour réparer la maison"
+            texte = fontTexte.render(txtTexte, True, (0, 255, 0))
+            surface.blit(texte, (width, 100))
+        else:
+            fontTexte = pygame.font.SysFont("comicsansms", 15)
+            txtTexte = "Chercher un panneau solaire pour réparer"
+            texte = fontTexte.render(txtTexte, True, (0, 255, 0))
+            surface.blit(texte, (width, 100))
+
     elif personnage.inventaire:
         fontTexte = pygame.font.SysFont("comicsansms", 15)
         txtTexte = "Ramasser "+ str(objectifCannette) +" objets pour améliorer la ville"
@@ -139,16 +165,20 @@ def texte(surface):
 
         x = width
         y = 250
+        nbCannette = 0
         for i in range(len(personnage.inventaire)):
 
-            if i%3 == 0:
+            if i % 3 == 0:
                 y += 50
                 x = width
             if personnage.inventaire[i][2] == 'cannette':
                 surface.blit(pygame.image.load('images/canette1.png'), (x, y, 50, 50))
+                nbCannette += 1
+            elif personnage.inventaire[i][2] == 'panneau':
+                    surface.blit(pygame.image.load('images/paneau-v2.png'), (x, y, 50, 50))
             x += widthTexte/3
 
-        if len(personnage.inventaire) == objectifCannette:
+        if nbCannette == objectifCannette:
             if personnage.textReponse != '':
                 blit_alpha(surface, dark_background, (0, 0), luminosite)
                 if personnage.textReponse != 'faux':
@@ -156,7 +186,11 @@ def texte(surface):
                 else:
                     blit_text(surface, personnage.textReponse, (100, 300), pygame.font.SysFont('Arial', 25), pygame.Color('red'))
                 personnage.modeQuestion = 0
-                personnage.inventaire = []
+                inventaireCopy = personnage.inventaire.copy()
+                for i in range(len(personnage.inventaire)):
+                    if personnage.inventaire[i][2] == 'cannette':
+                        inventaireCopy.remove(personnage.inventaire[i])
+                personnage.inventaire = inventaireCopy
                 personnage.textReponse = ''
                 pygame.display.update()
                 time.sleep(5)
@@ -172,7 +206,7 @@ def texte(surface):
     if personnage.score == -1:
         blit_alpha(surface, background, (0, 0), 1000)
         font = pygame.font.SysFont("comicsansms", 30)
-        message = font.render("Votre ville a été pollué! Votre but est de lui rendre son éclat d'antan", True, (0, 0, 0))
+        message = font.render("Ta ville a été pollué! Ton but est de lui rendre son éclat d'antan", True, (0, 0, 0))
         longueur = message.get_width()
         surface.blit(message, (width / 2 - longueur / 2, height / 2))
         pygame.display.update()
@@ -209,7 +243,7 @@ def redrawWindow(surface):
     if personnage.score > 3:
         blit_alpha(surface, background, (0, 0), 1000)
         font = pygame.font.SysFont("comicsansms", 30)
-        message = font.render("Vous avez réussi à dépoluer la ville! Félicitations!", True, (0, 255, 0))
+        message = font.render("Tu as réussi à dépoluer la ville! Félicitations!", True, (0, 255, 0))
         longueur = message.get_width()
         surface.blit(message, (width / 2 - longueur / 2, height / 2))
         pygame.display.update()
@@ -244,7 +278,7 @@ def main():
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
         [1, 1, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0],
-        [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+        [3, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
     ]
     listDechet = []
     for i in range(len(carte)):
@@ -255,7 +289,7 @@ def main():
                     listDechet.append((j, i))
 
     emplacementPanneau = []
-    while not emplacementPanneau:
+    while len(emplacementPanneau) != 3:
         i = random.randrange(0, 19, 1)
         j = random.randrange(0, 19, 1)
         if carte[j][i] == 0 or carte[j][i] == 3:
@@ -267,14 +301,13 @@ def main():
         i = random.randrange(0, 19, 1)
         j = random.randrange(0, 19, 1)
         if carte[j][i] == 1:
-            emplacementMaisonAbime.append((j,i, 0))
-            print('i : ' + str(i) + ';; j : ' + str(j))
+            emplacementMaisonAbime.append((j, i, 0))
 
 
 
     objectifCannette = 2
     personnage = Personnage()
-    luminosite = 200
+    luminosite = 175
     # personnage.x=900
     # personnage.y=100
     width = 1000
@@ -338,6 +371,9 @@ def main():
                 if personnage.case in listDechet:
                     personnage.inventaire.append((personnage.case[0], personnage.case[1], 'cannette'))
                     listDechet.remove(personnage.case)
+                elif personnage.case in emplacementPanneau:
+                    personnage.inventaire.append((personnage.case[0], personnage.case[1], 'panneau'))
+                    emplacementPanneau.remove(personnage.case)
         else:
             if pressed.get(pygame.K_a):
                 texte = QuestionVerifier(personnage.score, 'a')
@@ -349,12 +385,11 @@ def main():
                 texte = QuestionVerifier(personnage.score, 'b')
                 if texte != 'faux':
                     personnage.score += 1
-                    luminosite-=50
+                    luminosite -= 40
                 personnage.textReponse = texte
 
 
 
-        clock.tick(40)
         redrawWindow(win)
 
 

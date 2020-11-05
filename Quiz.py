@@ -2,10 +2,10 @@ from Question import Question
 ScoreQuiz = 0
 
 question_prompts = [
-     "Quelle type d'énergie utiliser ?\n(a)Solaire\n(b)Charbon",
-     "Avec quoi construire ça maison ?\n(a)Matériel produit en masse\n(b)Bambou",
-     "Quoi faire avec les déchets ?\n(a)Les jeters\n(b)Les recycler",
-     "Comment voyager ?\n(a)A pied ou en vélo\n(b)Seul en voiture",
+     "Quel type d'énergie utiliser ?(a)Solaire (b)Charbon",
+     "Avec quoi construire sa maison ?(a)Matériel/produit en masse (b)Bambou",
+     "Que faire des déchets ?(a)Les jeters (b)Les recycler",
+     "Comment voyager ? (a)A pied ou en vélo (b)Seul en voiture",
 ]
 
 questions = [
