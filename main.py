@@ -9,7 +9,7 @@ from Quiz import QuestionVerifier
 
 class Personnage:
     def __init__(self):
-        self.score = 0
+        self.score = -1
         self.width = 25
         self.height = 39
         self.x = 0
@@ -367,6 +367,10 @@ def main():
                 y = int((personnage.y+personnage.height)/50)
                 if carte[x][y] == 0 or carte[x][y] == 3:
                     personnage.move_left()
+            caseGauche = (personnage.case[0] + 1, personnage.case[1], 0)
+            caseHaut = (personnage.case[0] - 1, personnage.case[1], 0)
+            caseDroite = (personnage.case[0], personnage.case[1] + 1, 0)
+            caseBas = (personnage.case[0], personnage.case[1] - 1, 0)
             if pressed.get(pygame.K_SPACE):
                 if personnage.case in listDechet:
                     personnage.inventaire.append((personnage.case[0], personnage.case[1], 'cannette'))
@@ -374,6 +378,46 @@ def main():
                 elif personnage.case in emplacementPanneau:
                     personnage.inventaire.append((personnage.case[0], personnage.case[1], 'panneau'))
                     emplacementPanneau.remove(personnage.case)
+                elif caseGauche in emplacementMaisonAbime:
+                    isPanneau =False
+                    for i in range( len(personnage.inventaire)):
+                        if personnage.inventaire[i][2] == 'panneau':
+                            isPanneau = True
+                            break
+                    if isPanneau == True:
+                        emplacementMaisonAbime.remove(caseGauche)
+                        emplacementMaisonAbime.append((personnage.case[0] + 1, personnage.case[1], 1))
+                        personnage.inventaire.pop(i)
+                elif caseHaut in emplacementMaisonAbime:
+                    isPanneau =False
+                    for i in range( len(personnage.inventaire)):
+                        if personnage.inventaire[i][2] == 'panneau':
+                            isPanneau = True
+                            break
+                    if isPanneau == True:
+                        emplacementMaisonAbime.remove(caseHaut)
+                        emplacementMaisonAbime.append((personnage.case[0] - 1, personnage.case[1], 1))
+                        personnage.inventaire.pop(i)
+                elif caseDroite in emplacementMaisonAbime:
+                    isPanneau =False
+                    for i in range( len(personnage.inventaire)):
+                        if personnage.inventaire[i][2] == 'panneau':
+                            isPanneau = True
+                            break
+                    if isPanneau == True:
+                        emplacementMaisonAbime.remove(caseDroite)
+                        emplacementMaisonAbime.append((personnage.case[0], personnage.case[1]+1, 1))
+                        personnage.inventaire.pop(i)
+                elif caseBas in emplacementMaisonAbime:
+                    isPanneau =False
+                    for i in range( len(personnage.inventaire)):
+                        if personnage.inventaire[i][2] == 'panneau':
+                            isPanneau = True
+                            break
+                    if isPanneau == True:
+                        emplacementMaisonAbime.remove(caseBas)
+                        emplacementMaisonAbime.append((personnage.case[0], personnage.case[1]-1, 1))
+                        personnage.inventaire.pop(i)
         else:
             if pressed.get(pygame.K_a):
                 texte = QuestionVerifier(personnage.score, 'a')
