@@ -53,26 +53,35 @@ def drawGrid(w, h, lines, rows, surface):
                 surface.blit(pygame.image.load('images/route2.jpg'), (50*j, 50*i, 50, 50))
                 if (j,i) in listDechet:
                     surface.blit(pygame.image.load('images/canette1.png'), (50 * j, 50 * i, 50, 50))
+                elif (j, i) in emplacementPanneau:
+                    surface.blit(pygame.image.load('images/paneau-v2.png'), (50 * j+15, 50 *i, 50, 50))
 
             elif carte[j][i] == 1:
-                if i != 0:
-                    if carte[j][i-1] == 0:
-                        surface.blit(pygame.image.load('images/maison.png'), (50 * j, 50 * i, 50, 50))
-                if j != len(carte)-1:
-                    if carte[j+1][i] == 0:
-                        surface.blit(pygame.image.load('images/maison-droite.png'), (50 * j, 50 * i, 50, 50))
-                if i != len(carte[0])-1:
-                    if carte[j][i+1] == 0:
-                        surface.blit(pygame.image.load('images/maison-bas.png'), (50 * j, 50 * i, 50, 50))
-                if j != 0:
-                    if carte[j-1][i] == 0:
-                        surface.blit(pygame.image.load('images/maison-gauche.png'), (50 * j, 50 * i, 50, 50))
+                if (j, i, 0) in emplacementMaisonAbime:
+                    surface.blit(pygame.image.load('images/maisonAbime.png'), (50 * j, 50 * i, 50, 50))
+                elif (j, i, 1) in emplacementMaisonAbime:
+                    surface.blit(pygame.image.load('images/maison-jolie.png'), (50 * j, 50 * i, 50, 50))
+                else:
+                    if i != 0:
+                        if carte[j][i-1] == 0 or carte[j][i-1] == 3:
+                            surface.blit(pygame.image.load('images/maison.png'), (50 * j, 50 * i, 50, 50))
+                    if j != len(carte)-1:
+                        if carte[j+1][i] == 0 or carte[j+1][i] == 3:
+                            surface.blit(pygame.image.load('images/maison-droite.png'), (50 * j, 50 * i, 50, 50))
+                    if i != len(carte[0])-1:
+                        if carte[j][i+1] == 0 or carte[j][i+1] == 3:
+                            surface.blit(pygame.image.load('images/maison-bas.png'), (50 * j, 50 * i, 50, 50))
+                    if j != 0:
+                        if carte[j-1][i] == 0 or carte[j-1][i] == 3:
+                            surface.blit(pygame.image.load('images/maison-gauche.png'), (50 * j, 50 * i, 50, 50))
             elif carte[j][i] == 2:
                 surface.blit(pygame.image.load('images/immeuble.png'), (50 * j, 50 * i, 50, 50))
             elif carte[j][i] == 3:
                 surface.blit(pygame.image.load('images/park.png'), (50 * j, 50 * i, 50, 50))
                 if (j,i) in listDechet:
                     surface.blit(pygame.image.load('images/canette1.png'), (50 * j, 50 * i, 50, 50))
+                elif (j, i) in emplacementPanneau:
+                    surface.blit(pygame.image.load('images/panneau.png'), (50 * j, 50 * i, 50, 50))
     x = 0
     y = 0
     for l in range(rows):
@@ -141,11 +150,11 @@ def texte(surface):
 
         if len(personnage.inventaire) == objectifCannette:
             if personnage.textReponse != '':
-                blit_alpha(surface, background, (0, 0), 150)
-                message = font.render(personnage.textReponse, True, (0, 0, 0))
-                longueur = message.get_width()
-                blit_text(surface, personnage.textReponse, (70, 300), pygame.font.SysFont('Arial', 25))
-
+                blit_alpha(surface, dark_background, (0, 0), luminosite)
+                if personnage.textReponse != 'faux':
+                    blit_text(surface, personnage.textReponse, (100, 300), pygame.font.SysFont('Arial', 25), pygame.Color('green'))
+                else:
+                    blit_text(surface, personnage.textReponse, (100, 300), pygame.font.SysFont('Arial', 25), pygame.Color('red'))
                 personnage.modeQuestion = 0
                 personnage.inventaire = []
                 personnage.textReponse = ''
@@ -153,22 +162,22 @@ def texte(surface):
                 time.sleep(5)
 
             else:
-                blit_alpha(surface, background, (0, 0), 150)
                 question = Prompt(personnage.score)
                 message = font.render(question, True, (0, 0, 0))
                 longueur = message.get_width()
                 surface.blit(message, (width/2-longueur/2, height/2))
                 personnage.modeQuestion = 1
 
-    if personnage.score == 0:
-        blit_alpha(surface, dark_background, (0, 0), 150)
-    if personnage.score == 1:
-        blit_alpha(surface, dark_background, (0, 0), 125)
-    if personnage.score == 2:
-        blit_alpha(surface, dark_background, (0, 0), 100)
-    if personnage.score == 3:
-        blit_alpha(surface, dark_background, (0, 0), 75)
-
+    blit_alpha(surface, dark_background, (0, 0), luminosite)
+    if personnage.score == -1:
+        blit_alpha(surface, background, (0, 0), 1000)
+        font = pygame.font.SysFont("comicsansms", 30)
+        message = font.render("Votre ville a été pollué! Votre but est de lui rendre son éclat d'antan", True, (0, 0, 0))
+        longueur = message.get_width()
+        surface.blit(message, (width / 2 - longueur / 2, height / 2))
+        pygame.display.update()
+        time.sleep(5)
+        personnage.score = 0
 
     pass
 
@@ -176,7 +185,7 @@ def texte(surface):
 def blit_text(surface, text, pos, font, color=pygame.Color('black')):
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     space = font.size(' ')[0]  # The width of a space.
-    max_width, max_height = (1000, 1000)
+    max_width, max_height = (900, 1000)
     x, y = pos
     for line in words:
         for word in line:
@@ -193,16 +202,26 @@ def blit_text(surface, text, pos, font, color=pygame.Color('black')):
 def redrawWindow(surface):
     global rows, width, s, snack, personnage
     surface.fill((0, 0, 0))
-    blit_alpha(surface, background, (0, 0), 128)
+    # blit_alpha(surface, background, (0, 0), 128)
     drawGrid(width, height, lines, rows, surface)
     placerPersonnage(surface, personnage)
     texte(surface)
+    if personnage.score > 3:
+        blit_alpha(surface, background, (0, 0), 1000)
+        font = pygame.font.SysFont("comicsansms", 30)
+        message = font.render("Vous avez réussi à dépoluer la ville! Félicitations!", True, (0, 255, 0))
+        longueur = message.get_width()
+        surface.blit(message, (width / 2 - longueur / 2, height / 2))
+        pygame.display.update()
+        time.sleep(5)
+        pygame.quit()
+
     pygame.display.update()
 
 
 def main():
     pygame.init()
-    global width, height, rows, s, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, pas, widthTexte, listDechet, objectifCannette, clock, dark_background
+    global width, height, rows, s,emplacementPanneau, emplacementMaisonAbime, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, luminosite, pas, widthTexte, listDechet, objectifCannette, clock, dark_background
     pas = 6
 
     carte = [
@@ -225,18 +244,37 @@ def main():
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
         [1, 1, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0],
-        [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+        [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
     ]
     listDechet = []
     for i in range(len(carte)):
         for j in range(len(carte[0])):
             if carte[j][i] == 0 or carte[j][i] == 3:
-                etatevenement = random.randrange(0, 8 , 1)
+                etatevenement = random.randrange(0, 8, 1)
                 if etatevenement == 1:
                     listDechet.append((j, i))
 
+    emplacementPanneau = []
+    while not emplacementPanneau:
+        i = random.randrange(0, 19, 1)
+        j = random.randrange(0, 19, 1)
+        if carte[j][i] == 0 or carte[j][i] == 3:
+            if (j, i) not in listDechet:
+                emplacementPanneau.append((j, i))
+
+    emplacementMaisonAbime = []
+    while len(emplacementMaisonAbime) != len(emplacementPanneau):
+        i = random.randrange(0, 19, 1)
+        j = random.randrange(0, 19, 1)
+        if carte[j][i] == 1:
+            emplacementMaisonAbime.append((j,i, 0))
+            print('i : ' + str(i) + ';; j : ' + str(j))
+
+
+
     objectifCannette = 2
     personnage = Personnage()
+    luminosite = 200
     # personnage.x=900
     # personnage.y=100
     width = 1000
@@ -258,6 +296,7 @@ def main():
     pressed = {}
     clock = pygame.time.Clock()
     while running:
+
         switcher = {
             0: "pas de gagnant",
             1: "équipe 1",
@@ -310,12 +349,15 @@ def main():
                 texte = QuestionVerifier(personnage.score, 'b')
                 if texte != 'faux':
                     personnage.score += 1
+                    luminosite-=50
                 personnage.textReponse = texte
 
 
 
         clock.tick(40)
         redrawWindow(win)
+
+
     pass
 
 
