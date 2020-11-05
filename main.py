@@ -148,7 +148,7 @@ def texte(surface):
         txtTexte = "Ramasser "+ str(objectifCannette) +" objets pour améliorer la ville"
         texte = fontTexte.render(txtTexte, True, (0, 255, 0))
         surface.blit(texte, (width, 100))
-
+    blit_alpha(surface, dark_background, (0, 0), luminosite)
     if personnage.inventaire:
         x = 0
         y = 300
@@ -177,12 +177,10 @@ def texte(surface):
             elif personnage.inventaire[i][2] == 'panneau':
                     surface.blit(pygame.image.load('images/paneau-v2.png'), (x, y, 50, 50))
             x += widthTexte/3
-
         if nbCannette == objectifCannette:
             if personnage.textReponse != '':
-                blit_alpha(surface, dark_background, (0, 0), luminosite)
                 if personnage.textReponse != 'faux':
-                    blit_text(surface, personnage.textReponse, (100, 300), pygame.font.SysFont('Arial', 25), pygame.Color('green'))
+                    blit_text(surface, personnage.textReponse, (100, 300), pygame.font.SysFont('Arial', 25), pygame.Color((255,255,255)))
                 else:
                     blit_text(surface, personnage.textReponse, (100, 300), pygame.font.SysFont('Arial', 25), pygame.Color('red'))
                 personnage.modeQuestion = 0
@@ -197,12 +195,10 @@ def texte(surface):
 
             else:
                 question = Prompt(personnage.score)
-                message = font.render(question, True, (0, 0, 0))
-                longueur = message.get_width()
-                surface.blit(message, (width/2-longueur/2, height/2))
+                blit_text(surface, question, (100, 400), pygame.font.SysFont('Arial', 40),pygame.Color((255,255,255)))
                 personnage.modeQuestion = 1
 
-    blit_alpha(surface, dark_background, (0, 0), luminosite)
+
     if personnage.score == -1:
         blit_alpha(surface, background, (0, 0), 1000)
         font = pygame.font.SysFont("comicsansms", 30)
@@ -210,7 +206,7 @@ def texte(surface):
         longueur = message.get_width()
         surface.blit(message, (width / 2 - longueur / 2, height / 2))
         pygame.display.update()
-        time.sleep(5)
+        time.sleep(10)
         personnage.score = 0
 
     pass
@@ -247,7 +243,7 @@ def redrawWindow(surface):
         longueur = message.get_width()
         surface.blit(message, (width / 2 - longueur / 2, height / 2))
         pygame.display.update()
-        time.sleep(5)
+        time.sleep(200)
         pygame.quit()
 
     pygame.display.update()
@@ -256,7 +252,7 @@ def redrawWindow(surface):
 def main():
     pygame.init()
     global width, height, rows, s,emplacementPanneau, emplacementMaisonAbime, snack, background, lines, soldats, sizeBtwnX, sizeBtwnY, joueur, possibilities, personnage, carte, luminosite, pas, widthTexte, listDechet, objectifCannette, clock, dark_background
-    pas = 6
+    pas = 8
 
     carte = [
         [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
@@ -423,6 +419,7 @@ def main():
                 texte = QuestionVerifier(personnage.score, 'a')
                 if texte != 'faux':
                     personnage.score += 1
+                    luminosite -= 40
                 personnage.textReponse = texte
 
             elif pressed.get(pygame.K_b):
